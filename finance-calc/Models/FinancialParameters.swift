@@ -1,7 +1,7 @@
-//
-//  FinancialParameters.swift
-//  finance-calc
-//
-//  Created by user262003 on 3/13/25.
-//
+import Foundation
 
+struct CalculationResult {
+    var estimatedValue: Double?
+    var success: Bool
+    var errorMessage: String?
+}
