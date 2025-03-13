@@ -2,30 +2,34 @@ import SwiftUI
 
 struct MainTabView: View {
     var body: some View {
-        TabView {
-            Tab("Home", systemImage: "house.fill"){
-                HomeView()
+        NavigationStack{
+            TabView {
+                Tab("Home", systemImage: "house.fill"){
+                    HomeView()
+                }
+                Tab("Compound", systemImage: "dollarsign.circle"){
+                    CompoundInterestView()
+                }
+                Tab("Savings", systemImage: "chart.bar.fill"){
+                    SavingsView()
+                }
+                Tab("Loan", systemImage: "creditcard.fill"){
+                    LoanView()
+                }
+                Tab("Mortgage", systemImage: "house.fill"){
+                    MortgageView()
+                }
+                Tab("Help", systemImage: "questionmark.circle.fill"){
+                    MortgageView()
+                }
             }
-            Tab("Compound", systemImage: "dollarsign.circle"){
-                CompoundInterestView()
-            }
-            Tab("Savings", systemImage: "chart.bar.fill"){
-                SavingsView()
-            }
-            Tab("Loan", systemImage: "creditcard.fill"){
-                LoanView()
-            }
-            Tab("Mortgage", systemImage: "house.fill"){
-                MortgageView()
-            }
-            Tab("Help", systemImage: "questionmark.circle.fill"){
-                MortgageView()
-            }
-            
+            .navigationTitle("Financial Calculator")
         }
     }
 }
 
-#Preview {
-    MainTabView()
+struct MainTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainTabView()
+    }
 }
