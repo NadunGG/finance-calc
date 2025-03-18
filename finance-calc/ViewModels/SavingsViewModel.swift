@@ -1,30 +1,113 @@
 import Foundation
 
 class SavingsViewModel: ObservableObject {
-    @Published var initialInvestment: String = "" // P
-    @Published var monthlyContribution: String = "" // PMT
-    @Published var interestRate: String = "" // r
-    @Published var numberOfYears: String = "" // N
-    @Published var futureValue: String? // A (Result)
+    enum CalculationType: String, CaseIterable {
+        case numberOfYears = "Number of Years (N)"
+        case initialInvestment = "Initial Investment (P)"
+        case futureValue = "Future Value (A)"
+        case monthlyContribution = "Monthly Contribution (PMT)"
+        case interestRate = "Interest Rate (r)"
+    }
     
+    @Published var initialInvestment: String = ""
+    @Published var futureValue: String = ""
+    @Published var monthlyContribution: String = ""
+    @Published var interestRate: String = ""
+    @Published var numberOfYears: String = ""
+    @Published var paymentDue: String = "1" // Default to end of period
+    @Published var selectedCalculation: CalculationType = .futureValue
+    
+    @Published var result: String?
     @Published var errorMessage: String?
     
-    func calculateFutureValue() {
-        guard let P = Double(initialInvestment), let PMT = Double(monthlyContribution), let r = Double(interestRate), let N = Double(numberOfYears) else {
-            errorMessage = "Please enter valid numerical values."
-            return
-        }
-        
-        let monthlyRate = (r / 100) / 12 // Convert r to decimal and monthly rate
-        let totalMonths = N * 12
-        let futureValueLumpSum = FinancialFormulas.calculateFutureValue(P: P, r: r / 100, N: N, CpY: 12)
-        let futureValueContributions = PMT * ((pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate)
-        
-        let A = futureValueLumpSum + futureValueContributions
-        
-        DispatchQueue.main.async {
-            self.futureValue = String(format: "%.2f", A)
-            self.errorMessage = nil
+    private let savingsCalc = SavingsCalculator()
+    
+    func calculate() {
+        switch selectedCalculation {
+        case .futureValue:
+            guard let P = Double(initialInvestment),
+                  let PMT = Double(monthlyContribution),
+                  let r = Double(interestRate),
+                  let N = Double(numberOfYears),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Initial Investment, Monthly Contribution, Interest Rate, Number of Years, and Payment Due."
+                return
+            }
+            let A = savingsCalc.calculateFutureValue(P: P, PMT: PMT, r: r, n: N, pmtAt: pmtAt == 0 ? .beginning : .end)
+            DispatchQueue.main.async {
+                self.result = String(format: "%.2f", A)
+                self.errorMessage = nil
+            }
+            
+        case .initialInvestment:
+            guard let PMT = Double(monthlyContribution),
+                  let A = Double(futureValue),
+                  let r = Double(interestRate),
+                  let N = Double(numberOfYears),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Monthly Contribution, Future Value, Interest Rate, Number of Years, and Payment Due."
+                return
+            }
+            let P = savingsCalc.calculateInitialInvestment(A: A, PMT: PMT, r: r, n: N, pmtAt: pmtAt == 0 ? .beginning : .end)
+            DispatchQueue.main.async {
+                self.result = String(format: "%.2f", P)
+                self.errorMessage = nil
+            }
+            
+        case .numberOfYears:
+            guard let P = Double(initialInvestment),
+                  let PMT = Double(monthlyContribution),
+                  let A = Double(futureValue) + PMT * Double(numberOfYears) ?? 0 * 12,
+                  let r = Double(interestRate),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Initial Investment, Monthly Contribution, Future Value, Interest Rate, and Payment Due."
+                return
+            }
+            if let N = savingsCalc.calculateNumberOfYears(P: P, PMT: PMT, A: A, r: r, pmtAt: pmtAt == 0 ? .beginning : .end) {
+                DispatchQueue.main.async {
+                    self.result = String(format: "%.2f", N)
+                    self.errorMessage = nil
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.errorMessage = "Could not compute number of years."
+                }
+            }
+            
+        case .monthlyContribution:
+            guard let P = Double(initialInvestment),
+                  let A = Double(futureValue),
+                  let r = Double(interestRate),
+                  let N = Double(numberOfYears),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Initial Investment, Future Value, Interest Rate, Number of Years, and Payment Due."
+                return
+            }
+            let PMT = savingsCalc.calculateMonthlyContribution(A: A, P: P, r: r, n: N, pmtAt: pmtAt == 0 ? .beginning : .end)
+            DispatchQueue.main.async {
+                self.result = String(format: "%.2f", PMT)
+                self.errorMessage = nil
+            }
+            
+        case .interestRate:
+            guard let P = Double(initialInvestment),
+                  let PMT = Double(monthlyContribution),
+                  let A = Double(futureValue),
+                  let N = Double(numberOfYears),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Initial Investment, Monthly Contribution, Future Value, Number of Years, and Payment Due."
+                return
+            }
+            if let r = savingsCalc.calculateInterestRate(P: P, PMT: PMT, A: A, n: N, pmtAt: pmtAt == 0 ? .beginning : .end) {
+                DispatchQueue.main.async {
+                    self.result = String(format: "%.2f%%", r)
+                    self.errorMessage = nil
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.errorMessage = "Could not estimate interest rate. Try different values."
+                }
+            }
         }
     }
 }

@@ -6,26 +6,45 @@ struct MortgageView: View {
     var body: some View {
         Form {
             Section(header: Text("Mortgage Calculation")) {
-                TextField("Home Price (P)", text: $viewModel.homePrice)
-                    .keyboardType(.decimalPad)
-                
-                TextField("Down Payment", text: $viewModel.downPayment)
-                    .keyboardType(.decimalPad)
-                
-                TextField("Loan Term (Years, N)", text: $viewModel.loanTerm)
-                    .keyboardType(.decimalPad)
+                Picker("Calculation Type", selection: $viewModel.selectedCalculation) {
+                    ForEach(MortgageViewModel.CalculationType.allCases, id: \ .self) { value in
+                        Text(value.rawValue)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+            }
+            
+                if viewModel.selectedCalculation != .loanAmount {
+                    TextField("Loan Amount", text: $viewModel.loanAmount)
+                        .keyboardType(.decimalPad)
+                }
                 
                 TextField("Interest Rate (%)", text: $viewModel.interestRate)
                     .keyboardType(.decimalPad)
                 
-                Button("Calculate") {
-                    viewModel.calculateMortgagePayment()
+                if viewModel.selectedCalculation != .numberOfPayments {
+                    TextField("Number of Payments", text: $viewModel.numberOfYears)
+                        .keyboardType(.decimalPad)
+                }
+                
+                if viewModel.selectedCalculation != .monthlyPayment {
+                    TextField("Monthly Payment", text: $viewModel.monthlyPayment)
+                        .keyboardType(.decimalPad)
+                }
+                
+                Picker("Payment Due", selection: $viewModel.paymentDue) {
+                    Text("Beginning of Period").tag("0")
+                    Text("End of Period").tag("1")
                 }
             }
             
-            if let monthlyPayment = viewModel.monthlyPayment {
-                Section(header: Text("Monthly Payment")) {
-                    Text("Rs. \(monthlyPayment)")
+            Button("Calculate") {
+                viewModel.calculate()
+            }
+            
+            if let result = viewModel.result {
+                Section(header: Text("Result")) {
+                    Text("Rs. \(result)")
                         .font(.headline)
                 }
             }

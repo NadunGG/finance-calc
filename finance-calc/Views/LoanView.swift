@@ -6,23 +6,46 @@ struct LoanView: View {
     var body: some View {
         Form {
             Section(header: Text("Loan Calculation")) {
-                TextField("Loan Amount (P)", text: $viewModel.loanAmount)
-                    .keyboardType(.decimalPad)
+                Picker("Solve for:", selection: $viewModel.selectedCalculation) {
+                    ForEach(LoanViewModel.CalculationType.allCases, id: \ .self) { value in
+                        Text(value.rawValue)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
                 
-                TextField("Interest Rate (%)", text: $viewModel.interestRate)
-                    .keyboardType(.decimalPad)
+                if viewModel.selectedCalculation != .loanAmount {
+                    TextField("Loan Amount (P)", text: $viewModel.loanAmount)
+                        .keyboardType(.decimalPad)
+                }
                 
-                TextField("Number of Years (N)", text: $viewModel.numberOfYears)
-                    .keyboardType(.decimalPad)
+                if viewModel.selectedCalculation != .interestRate {
+                    TextField("Interest Rate (%)", text: $viewModel.interestRate)
+                        .keyboardType(.decimalPad)
+                }
+                
+                if viewModel.selectedCalculation != .numberOfPayments {
+                    TextField("Number of Payments (N)", text: $viewModel.numberOfPayments)
+                        .keyboardType(.decimalPad)
+                }
+                
+                if viewModel.selectedCalculation != .monthlyPayment {
+                    TextField("Monthly Payment (PMT)", text: $viewModel.monthlyPayment)
+                        .keyboardType(.decimalPad)
+                }
+
+                Picker("Payment Due", selection: $viewModel.paymentDue) {
+                    Text("Beginning of Period").tag("0")
+                    Text("End of Period").tag("1")
+                }
                 
                 Button("Calculate") {
-                    viewModel.calculateMonthlyPayment()
+                    viewModel.calculateValue()
                 }
             }
             
-            if let monthlyPayment = viewModel.monthlyPayment {
-                Section(header: Text("Monthly Payment")) {
-                    Text("Rs. \(monthlyPayment)")
+            if let result = viewModel.result {
+                Section(header: Text("Result")) {
+                    Text("Rs. \(result)")
                         .font(.headline)
                 }
             }

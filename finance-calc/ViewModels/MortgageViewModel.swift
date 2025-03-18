@@ -1,30 +1,72 @@
 import Foundation
 
 class MortgageViewModel: ObservableObject {
-    @Published var homePrice: String = "" // P
-    @Published var downPayment: String = "" // Initial amount paid upfront
-    @Published var loanTerm: String = "" // N (Years)
-    @Published var interestRate: String = "" // r
-    @Published var monthlyPayment: String? // PMT (Result)
+    enum CalculationType: String, CaseIterable {
+        case loanAmount = "Loan Amount (P)"
+        case numberOfPayments = "Number of Payments (N)"
+        case monthlyPayment = "Monthly Payment (PMT)"
+    }
     
+    @Published var loanAmount: String = ""
+    @Published var interestRate: String = ""
+    @Published var numberOfPayments: String = ""
+    @Published var monthlyPayment: String = ""
+    @Published var paymentDue: String = "1" // Default to end of period
+    @Published var selectedCalculation: CalculationType = .monthlyPayment
+    
+    @Published var result: String?
     @Published var errorMessage: String?
     
-    func calculateMortgagePayment() {
-        guard let homePrice = Double(homePrice), let downPayment = Double(downPayment), 
-              let r = Double(interestRate), let N = Double(loanTerm) else {
-            errorMessage = "Please enter valid numerical values."
-            return
-        }
-        
-        let P = homePrice - downPayment // Loan principal after down payment
-        let monthlyRate = (r / 100) / 12 // Convert r to decimal and monthly rate
-        let totalMonths = N * 12
-        
-        let PMT = FinancialFormulas.calculatePayment(P: P, r: r / 100, N: N, CpY: 12)
-        
-        DispatchQueue.main.async {
-            self.monthlyPayment = String(format: "%.2f", PMT)
-            self.errorMessage = nil
+    private let mortgageCalc = MortgageCalculator()
+    
+    func calculate() {
+        switch selectedCalculation {
+        case .monthlyPayment:
+            guard let P = Double(loanAmount),
+                  let r = Double(interestRate),
+                  let N = Double(numberOfPayments),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Loan Amount, Interest Rate, Number of Payments, and Payment Due."
+                return
+            }
+            let PMT = mortgageCalc.calculateMonthlyPayment(P: P, r: r, n: N, pmtAt: pmtAt == 0 ? .beginning : .end)
+            DispatchQueue.main.async {
+                self.result = String(format: "%.2f", PMT)
+                self.errorMessage = nil
+            }
+            
+        case .loanAmount:
+            guard let PMT = Double(monthlyPayment),
+                  let r = Double(interestRate),
+                  let N = Double(numberOfPayments),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Monthly Payment, Interest Rate, Number of Payments, and Payment Due."
+                return
+            }
+            let P = mortgageCalc.calculateLoanAmount(PMT: PMT, r: r, n: N, pmtAt: pmtAt == 0 ? .beginning : .end)
+            DispatchQueue.main.async {
+                self.result = String(format: "%.2f", P)
+                self.errorMessage = nil
+            }
+            
+        case .numberOfPayments:
+            guard let P = Double(loanAmount),
+                  let PMT = Double(monthlyPayment),
+                  let r = Double(interestRate),
+                  let pmtAt = Int(paymentDue) else {
+                errorMessage = "Please enter valid numerical values for Loan Amount, Monthly Payment, Interest Rate, and Payment Due."
+                return
+            }
+            if let N = mortgageCalc.calculateNumberOfPayments(P: P, PMT: PMT, r: r, pmtAt: pmtAt == 0 ? .beginning : .end) {
+                DispatchQueue.main.async {
+                    self.result = String(format: "%.2f", N)
+                    self.errorMessage = nil
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.errorMessage = "Could not compute number of payments."
+                }
+            }
         }
     }
 }

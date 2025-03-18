@@ -6,23 +6,41 @@ struct CompoundInterestView: View {
     var body: some View {
         Form {
             Section(header: Text("Compound Interest Calculation")) {
-                TextField("Initial Investment (P)", text: $viewModel.presentValue)
-                    .keyboardType(.decimalPad)
+                Picker("Calculation Type", selection: $viewModel.selectedCalculation) {
+                    ForEach(CompoundInterestViewModel.CalculationType.allCases, id: \ .self) { value in
+                        Text(value.rawValue)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
                 
-                TextField("Interest Rate (%)", text: $viewModel.interestRate)
-                    .keyboardType(.decimalPad)
-                
-                TextField("Number of Years (N)", text: $viewModel.numberOfYears)
-                    .keyboardType(.decimalPad)
+                if viewModel.selectedCalculation != .presentValue {
+                    TextField("Initial Investment (P)", text: $viewModel.presentValue)
+                        .keyboardType(.decimalPad)
+                }
+
+                if viewModel.selectedCalculation != .futureValue {
+                    TextField("Future Value (A)", text: $viewModel.futureValue)
+                        .keyboardType(.decimalPad)
+                }
+
+                if viewModel.selectedCalculation != .interestRate {
+                    TextField("Interest Rate (%r)", text: $viewModel.interestRate)
+                        .keyboardType(.decimalPad)
+                }
+
+                if viewModel.selectedCalculation != .numberOfYears {
+                    TextField("Number of Years (N)", text: $viewModel.numberOfYears)
+                        .keyboardType(.decimalPad)
+                }
                 
                 Button("Calculate") {
-                    viewModel.calculateFutureValue()
+                    viewModel.calculate()
                 }
             }
             
-            if let futureValue = viewModel.futureValue {
-                Section(header: Text("Future Value")) {
-                    Text("Rs. \(futureValue)")
+            if let result = viewModel.result {
+                Section(header: Text("Result")) {
+                    Text(result)
                         .font(.headline)
                 }
             }
