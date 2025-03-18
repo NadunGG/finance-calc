@@ -22,9 +22,9 @@ struct HomeView: View {
                         MenuBoxView(title: "Mortgage Calculator", icon: "house.fill")
                     }
                     
-                    NavigationLink(destination: HelpView()) {
-                        MenuBoxView(title: "Help & Instructions", icon: "questionmark.circle.fill")
-                    }
+                    // NavigationLink(destination: HelpView()) {
+                    //     MenuBoxView(title: "Help & Instructions", icon: "questionmark.circle.fill")
+                    // }
                 }
                 .padding()
             }

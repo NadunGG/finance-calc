@@ -28,8 +28,8 @@ struct SavingsView: View {
                     .keyboardType(.decimalPad)
                 }
 
-                if viewModel.selectedCalculation != .numberOfYears {
-                    TextField("Number of Years (N)", text: $viewModel.numberOfYears)
+                if viewModel.selectedCalculation != .numberOfPayments {
+                    TextField("Number of Payments (N)", text: $viewModel.numberOfPayments)
                         .keyboardType(.decimalPad)
                 }
                 
