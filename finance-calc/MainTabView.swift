@@ -19,9 +19,6 @@ struct MainTabView: View {
                 Tab("Mortgage", systemImage: "house.fill"){
                     MortgageView()
                 }
-                Tab("Help", systemImage: "questionmark.circle.fill"){
-                    MortgageView()
-                }
             }
             .navigationTitle("Financial Calculator")
         }

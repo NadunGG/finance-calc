@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+    let columns = [GridItem(.adaptive(minimum:  150), spacing: 40)]
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -22,9 +22,9 @@ struct HomeView: View {
                         MenuBoxView(title: "Mortgage Calculator", icon: "house.fill")
                     }
                     
-                    // NavigationLink(destination: HelpView()) {
-                    //     MenuBoxView(title: "Help & Instructions", icon: "questionmark.circle.fill")
-                    // }
+                     NavigationLink(destination: HelpView()) {
+                         MenuBoxView(title: "Help & Instructions", icon: "questionmark.circle.fill")
+                     }
                 }
                 .padding()
             }
@@ -50,7 +50,7 @@ struct MenuBoxView: View {
                 .padding(.leading, 8)
         }
         .padding()
-        .frame(width: 150, height: 150)
+        .frame(maxWidth: .infinity, minHeight: 150)
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .shadow(radius: 4)

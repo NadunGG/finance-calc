@@ -6,37 +6,37 @@ struct MortgageView: View {
     var body: some View {
         Form {
             Section(header: Text("Mortgage Calculation")) {
-                Picker("Calculation Type", selection: $viewModel.selectedCalculation) {
+                Picker("Solve for", selection: $viewModel.selectedCalculation) {
                     ForEach(MortgageViewModel.CalculationType.allCases, id: \ .self) { value in
                         Text(value.rawValue)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(MenuPickerStyle())
             }
             
-                if viewModel.selectedCalculation != .loanAmount {
-                    TextField("Loan Amount", text: $viewModel.loanAmount)
-                        .keyboardType(.decimalPad)
-                }
-                
-                TextField("Interest Rate (%)", text: $viewModel.interestRate)
+            if viewModel.selectedCalculation != .loanAmount {
+                TextField("Loan Amount", text: $viewModel.loanAmount)
                     .keyboardType(.decimalPad)
-                
-                if viewModel.selectedCalculation != .numberOfPayments {
-                    TextField("Number of Payments", text: $viewModel.numberOfYears)
-                        .keyboardType(.decimalPad)
-                }
-                
-                if viewModel.selectedCalculation != .monthlyPayment {
-                    TextField("Monthly Payment", text: $viewModel.monthlyPayment)
-                        .keyboardType(.decimalPad)
-                }
-                
-                Picker("Payment Due", selection: $viewModel.paymentDue) {
-                    Text("Beginning of Period").tag("0")
-                    Text("End of Period").tag("1")
-                }
             }
+            
+            TextField("Interest Rate (%r)", text: $viewModel.interestRate)
+                .keyboardType(.decimalPad)
+            
+            if viewModel.selectedCalculation != .numberOfPayments {
+                TextField("Number of Payments", text: $viewModel.numberOfPayments)
+                    .keyboardType(.decimalPad)
+            }
+            
+            if viewModel.selectedCalculation != .monthlyPayment {
+                TextField("Monthly Payment", text: $viewModel.monthlyPayment)
+                    .keyboardType(.decimalPad)
+            }
+            
+            Picker("Payment Due", selection: $viewModel.paymentDue) {
+                Text("Beginning of Period").tag("0")
+                Text("End of Period").tag("1")
+            }
+            
             
             Button("Calculate") {
                 viewModel.calculate()
@@ -52,8 +52,7 @@ struct MortgageView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundColor(.red)
-            }
-        }
+            }}
         .navigationTitle("Mortgage Calculator")
     }
 }

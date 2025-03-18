@@ -1,3 +1,5 @@
+import Foundation
+
 struct LoanCalculator {
     enum PaymentDue { case beginning, end }
     

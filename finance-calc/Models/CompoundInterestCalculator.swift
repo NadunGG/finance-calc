@@ -1,3 +1,5 @@
+import Foundation
+
 struct CompoundInterestCalculator {
     func calculateFutureValue(P: Double, r: Double, n: Double, CpY: Double = 12) -> Double {
         let periodicRate = r / 100 / CpY

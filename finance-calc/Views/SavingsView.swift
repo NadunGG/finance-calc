@@ -6,12 +6,12 @@ struct SavingsView: View {
     var body: some View {
         Form {
             Section(header: Text("Savings Calculation")) {
-                Picker("Calculation Type", selection: $viewModel.selectedCalculation) {
-                    ForEach(CompoundInterestViewModel.CalculationType.allCases, id: \ .self) { value in
+                Picker("Solve for", selection: $viewModel.selectedCalculation) {
+                    ForEach(SavingsViewModel.CalculationType.allCases, id: \ .self) { value in
                         Text(value.rawValue)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(MenuPickerStyle())
                 
                 if viewModel.selectedCalculation != .initialInvestment {
                     TextField("Initial Investment (P)", text: $viewModel.initialInvestment)
@@ -42,7 +42,6 @@ struct SavingsView: View {
                     Text("Beginning of Period").tag("0")
                     Text("End of Period").tag("1")
                 }
-
 
                 Button("Calculate") {
                     viewModel.calculate()

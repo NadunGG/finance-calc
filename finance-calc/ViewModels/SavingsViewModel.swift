@@ -57,7 +57,7 @@ class SavingsViewModel: ObservableObject {
         case .numberOfPayments:
             guard let P = Double(initialInvestment),
                   let PMT = Double(monthlyContribution),
-                  let A = Double(futureValue) + PMT * Double(numberOfPayments) ?? 0 * 12,
+                  let A = Double(futureValue),
                   let r = Double(interestRate),
                   let pmtAt = Int(paymentDue) else {
                 errorMessage = "Please enter valid numerical values for Initial Investment, Monthly Contribution, Future Value, Interest Rate, and Payment Due."

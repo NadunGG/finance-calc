@@ -11,7 +11,7 @@ struct LoanView: View {
                         Text(value.rawValue)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(MenuPickerStyle())
                 
                 if viewModel.selectedCalculation != .loanAmount {
                     TextField("Loan Amount (P)", text: $viewModel.loanAmount)
@@ -19,7 +19,7 @@ struct LoanView: View {
                 }
                 
                 if viewModel.selectedCalculation != .interestRate {
-                    TextField("Interest Rate (%)", text: $viewModel.interestRate)
+                    TextField("Interest Rate (%r)", text: $viewModel.interestRate)
                         .keyboardType(.decimalPad)
                 }
                 

@@ -1,3 +1,5 @@
+import Foundation
+
 class CompoundInterestViewModel: ObservableObject {
     enum CalculationType: String, CaseIterable {
         case interestRate = "Interest Rate (r)"

@@ -5,29 +5,29 @@ struct CompoundInterestView: View {
     
     var body: some View {
         Form {
-            Section(header: Text("Compound Interest Calculation")) {
-                Picker("Calculation Type", selection: $viewModel.selectedCalculation) {
+            Section(header: Text("Compound Interest")) {
+                Picker("Solve for", selection: $viewModel.selectedCalculation) {
                     ForEach(CompoundInterestViewModel.CalculationType.allCases, id: \ .self) { value in
                         Text(value.rawValue)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(MenuPickerStyle())
                 
                 if viewModel.selectedCalculation != .presentValue {
-                    TextField("Initial Investment (P)", text: $viewModel.presentValue)
+                    TextField("Initial Investment (P)", text: $viewModel.initialInvestment)
                         .keyboardType(.decimalPad)
                 }
-
+                
                 if viewModel.selectedCalculation != .futureValue {
                     TextField("Future Value (A)", text: $viewModel.futureValue)
                         .keyboardType(.decimalPad)
                 }
-
+                
                 if viewModel.selectedCalculation != .interestRate {
                     TextField("Interest Rate (%r)", text: $viewModel.interestRate)
                         .keyboardType(.decimalPad)
                 }
-
+                
                 if viewModel.selectedCalculation != .numberOfYears {
                     TextField("Number of Years (N)", text: $viewModel.numberOfYears)
                         .keyboardType(.decimalPad)
@@ -49,8 +49,9 @@ struct CompoundInterestView: View {
                 Text(errorMessage)
                     .foregroundColor(.red)
             }
+            
         }
-        .navigationTitle("Compound Interest")
+        .navigationTitle("Compound Interest Calculator")
     }
 }
 
